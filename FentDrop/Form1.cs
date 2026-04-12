@@ -474,7 +474,7 @@ namespace FentDrop
             if(comida.Count == 0 && comenzar) //si ya no hay elementos y ya
                                               //inició el juego pasamos de nivel
             {                
-                if(!mientrasFrenesi)
+                if(!mientrasFrenesi) //si no es frenesi
                 {
                     timerjuego.Stop();
                     timerPersonaje.Stop();
@@ -502,7 +502,7 @@ namespace FentDrop
                     pasasNivel = false;
                     return;
                 }
-                else
+                else //en caso de que si 
                 {
                     timerjuego.Stop();
                     timerPersonaje.Stop();
@@ -655,6 +655,7 @@ namespace FentDrop
                         timerPersonaje.Stop();
                         player.controls.stop();
                         efectoBueno.Stop();
+                        timerParpadeo.Stop();
                         comida.Clear();
                         acabasDeMorir = true;
                         this.Invalidate();
