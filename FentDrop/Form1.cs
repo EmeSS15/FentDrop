@@ -57,7 +57,8 @@ namespace FentDrop
         int velocidad = 6; //velocidad inicial de la comida 
         int vidas = 5; //5 vidas 
         int numeroFilas = 7; //iniciales 
-        int nivelesTmp = 1; 
+        int nivelesTmp = 1;
+        int contadorDiv = 8;
 
         //booleanos
         bool comenzar = false;
@@ -210,11 +211,11 @@ namespace FentDrop
         private void cargarComidaInicio(int numeroFilas)
         { 
             //creamos la primera fila
-            int division = this.ClientSize.Width / 8;
+            int division = this.ClientSize.Width / contadorDiv;
             int cont = 0 + division;
             var comidaTmp = new List<Comida>();
             var ultimaFila = new List<Comida>();
-            for(int i = 1; i <= 7; i++)
+            for(int i = 1; i <= contadorDiv - 1; i++)
             {
                 if(rn.Next() % 2 == 0) //si es par agregamos comida buena 
                 {
@@ -223,7 +224,7 @@ namespace FentDrop
                         case 1:
                             comidaTmp.Add(new Comida(
                                 cont - 55,
-                                0 - rn.Next(100, 250),
+                                0 - rn.Next(200, 500),
                                 imgBanana
                             ));
                             break;
@@ -231,7 +232,7 @@ namespace FentDrop
                         case 2:
                             comidaTmp.Add(new Comida(
                                 cont - 55,
-                                0 - rn.Next(100, 250),
+                                0 - rn.Next(200, 500),
                                 imgSandia
                             ));
                             break;
@@ -239,7 +240,7 @@ namespace FentDrop
                         case 3:
                             comidaTmp.Add(new Comida(
                                 cont - 55,
-                                0 - rn.Next(100, 250),
+                                0 - rn.Next(200, 500),
                                 imgPollo
                             ));
                             break;
@@ -253,7 +254,7 @@ namespace FentDrop
                         case 1:
                             comidaTmp.Add(new Comida(
                                 cont - 55,
-                                0 - rn.Next(100, 250),
+                                0 - rn.Next(200, 500),
                                 imgHitler
                             ));
                             break;
@@ -261,7 +262,7 @@ namespace FentDrop
                         case 2:
                             comidaTmp.Add(new Comida(
                                 cont - 55,
-                                0 - rn.Next(100, 250),
+                                0 - rn.Next(200, 500),
                                 imgDerek
                             ));
                             break;
@@ -269,7 +270,7 @@ namespace FentDrop
                         case 3:
                             comidaTmp.Add(new Comida(
                                 cont - 55,
-                                0 - rn.Next(100, 250),
+                                0 - rn.Next(200, 500),
                                 imgAlgodon
                             ));
                             break;
@@ -287,8 +288,8 @@ namespace FentDrop
                 ultimaFila = comida[comida.Count - 1];
                 comidaTmp = new List<Comida>();
 
-                for(int j = 0; j < 7; j++)
-                {
+                for(int j = 0; j < contadorDiv - 1; j++)
+                {    
                     if(rn.Next() % 2 == 0) //si es par agregamos comida buena 
                     {
                         switch(rn.Next(1, 4))
@@ -296,7 +297,7 @@ namespace FentDrop
                             case 1:
                                 comidaTmp.Add(new Comida(
                                     ultimaFila[j].rec.X,
-                                    ultimaFila[j].rec.Y - rn.Next(100, 500),
+                                    ultimaFila[j].rec.Y - rn.Next(200, 500),
                                     imgBanana
                                 ));
                                 break;
@@ -304,7 +305,7 @@ namespace FentDrop
                             case 2:
                                 comidaTmp.Add(new Comida(
                                     ultimaFila[j].rec.X,
-                                    ultimaFila[j].rec.Y - rn.Next(100, 500),
+                                    ultimaFila[j].rec.Y - rn.Next(200, 500),
                                     imgSandia
                                 ));
                                 break;
@@ -312,7 +313,7 @@ namespace FentDrop
                             case 3:
                                 comidaTmp.Add(new Comida(
                                     ultimaFila[j].rec.X,
-                                    ultimaFila[j].rec.Y - rn.Next(100, 500),
+                                    ultimaFila[j].rec.Y - rn.Next(200, 500),
                                     imgPollo
                                 ));
                                 break;
@@ -326,7 +327,7 @@ namespace FentDrop
                             case 1:
                                 comidaTmp.Add(new Comida(
                                     ultimaFila[j].rec.X,
-                                    ultimaFila[j].rec.Y - rn.Next(100, 500),
+                                    ultimaFila[j].rec.Y - rn.Next(200, 500),
                                     imgHitler
                                 ));
                                 break;
@@ -334,7 +335,7 @@ namespace FentDrop
                             case 2:
                                 comidaTmp.Add(new Comida(
                                     ultimaFila[j].rec.X,
-                                    ultimaFila[j].rec.Y - rn.Next(100, 500),
+                                    ultimaFila[j].rec.Y - rn.Next(200, 500),
                                     imgDerek
                                 ));
                                 break;
@@ -342,7 +343,7 @@ namespace FentDrop
                             case 3:
                                 comidaTmp.Add(new Comida(
                                     ultimaFila[j].rec.X,
-                                    ultimaFila[j].rec.Y - rn.Next(100, 500),
+                                    ultimaFila[j].rec.Y - rn.Next(200, 500),
                                     imgAlgodon
                                 ));
                                 break;
@@ -471,6 +472,7 @@ namespace FentDrop
             //removemos todas las filas en donde su comida sea >
             comida.RemoveAll(c => c.All(item => item.rec.Y > this.ClientSize.Height));
 
+            //en caso de que se acaben los items
             if(comida.Count == 0 && comenzar) //si ya no hay elementos y ya
                                               //inició el juego pasamos de nivel
             {                
@@ -480,6 +482,7 @@ namespace FentDrop
                     timerPersonaje.Stop();
                     niveles++; //incrementamos
                     nivelesTmp++;
+                    contadorDiv++;
 
                     if(nivelesTmp == 9) //cada 10 niveles reseteamos las filas 
                     {
@@ -547,9 +550,9 @@ namespace FentDrop
                 return;
             }
 
-            //vamos fila por fila buscando fenta      
-            foreach(var filas in comida)
+            foreach(var filas in comida) //empezamos a ver 
             {
+                //vamos fila por fila buscando fenta//      
                 int n2 = filas.RemoveAll(comida =>
                     comida.hitBox.IntersectsWith(personaje.hitBox) && comida.esFenta);
 
@@ -577,14 +580,10 @@ namespace FentDrop
                     efectoFrenesi.Play();
                     return;
                 }
-            }
 
-            //eliminamos toda comida buena que choque con el personaje y le sumamos
-            //los puntos
-            int n = 0;
-            foreach(var c in comida)
-            {
-                n = c.RemoveAll(comida => comida.hitBox.IntersectsWith(personaje.hitBox)
+                //de ahi eliminamos toda comida buena que choque con
+                //el personaje y le sumamos //los puntos//
+                int n = filas.RemoveAll(comida => comida.hitBox.IntersectsWith(personaje.hitBox)
                     && comida.esBuena);
 
                 if(n > 0 && comenzar) //si n > 0 minimio se elimino 1
@@ -593,13 +592,13 @@ namespace FentDrop
 
                     if(!mientrasFrenesi) //solo si no es frenesi 
                     {
-                        efectoBueno.Play(); 
+                        efectoBueno.Play();
                         contadorTmp += n;
                     }
 
                     //si llegamos a >= 25 puntos 
                     if(contadorTmp >= 30)
-                    {                        
+                    {
                         contadorTmp = 0;
 
                         //procedemos a posicionar el fenta en la matriz 
@@ -611,7 +610,7 @@ namespace FentDrop
                                 comida.rec.Y <= -100);
 
                             if(j != -1) //en caso de encontrarlo
-                            {   
+                            {
                                 fila[j] = new Comida(
                                     fila[j].rec.X,
                                     fila[j].rec.Y,
@@ -627,15 +626,11 @@ namespace FentDrop
                         }
                     }
                 }
-            }
 
-            //eliminamos comida mala dependiendo si es frenesi
-            foreach(var filas in comida)
-            {
                 //en caso de que si sea sumamos puntos
                 int n3 = filas.RemoveAll(c => c.hitBox.IntersectsWith(personaje.hitBox) &&
                     !c.esBuena && personaje.esInmune);
-                if(n3 > 0 && comenzar) 
+                if (n3 > 0 && comenzar)
                 {
                     puntos += n3;
                 }
@@ -643,13 +638,13 @@ namespace FentDrop
                 //en caso de que no quitamos vidas 
                 int n4 = filas.RemoveAll(c => c.hitBox.IntersectsWith(personaje.hitBox)
                     && !c.esBuena && !personaje.esInmune);
-                if(n4 > 0)
+                if (n4 > 0)
                 {
                     efectoMalo.Play();
-                    
+
                     vidas--;
 
-                    if(vidas == 0)
+                    if (vidas == 0)
                     {
                         timerjuego.Stop();
                         timerPersonaje.Stop();
@@ -688,7 +683,11 @@ namespace FentDrop
                         return;
                     }
                 }
+            }
 
+            //eliminamos comida mala dependiendo si es frenesi
+            foreach(var filas in comida)
+            {
                 foreach(var item in filas)
                 {
                     item.MoverAbajo(velocidad);
