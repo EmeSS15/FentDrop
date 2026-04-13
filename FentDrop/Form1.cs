@@ -484,14 +484,15 @@ namespace FentDrop
                     nivelesTmp++;
                     contadorDiv++;
 
-                    if(nivelesTmp == 9) //cada 10 niveles reseteamos las filas 
+                    if(nivelesTmp == 9) //cada 9 niveles reseteamos las filas 
                     {
                         nivelesTmp = 1;
                         numeroFilas = 10;
+                        contadorDiv = 8;
                     }
                     else
                     {
-                        numeroFilas += 6;
+                        numeroFilas += 5;
                     }
 
                     velocidad++;
@@ -512,15 +513,17 @@ namespace FentDrop
                     timerFrenesi.Stop();
                     niveles++; //incrementamos
                     nivelesTmp++;
+                    contadorDiv++;
 
-                    if(nivelesTmp == 9) //cada 10 niveles reseteamos las filas 
+                    if(nivelesTmp == 9) //cada 9 niveles reseteamos las filas 
                     {
                         nivelesTmp = 1;
                         numeroFilas = 10;
+                        contadorDiv = 8;
                     }
                     else
                     {
-                        numeroFilas += 6;
+                        numeroFilas += 5;
                     }
 
                     velocidad++;
