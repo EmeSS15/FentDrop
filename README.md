@@ -2,6 +2,8 @@
 
 El Food Drop que George Floyd y Derek Chauvin merecían.
 Porque nada grita “juego familiar” como mezclar sobredosis, racismo y comida rápida cayendo del cielo.
+  
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/b36816b4-3efd-40f2-924c-41d7ce01871e" />
 
 # ¿De qué va?
 Controlas a un pobre desgraciado que intenta sobrevivir mientras llueven del cielo las peores decisiones de la humanidad:
