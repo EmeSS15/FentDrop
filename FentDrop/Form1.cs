@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Media;
 using System.Runtime.CompilerServices;
@@ -14,7 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WMPLib;
-using System.IO;
+using static System.Net.WebRequestMethods;
 
 namespace FentDrop
 {
@@ -22,7 +23,8 @@ namespace FentDrop
     {
         //personaje y listas de comida 
         FentBot personaje;
-        List<List<Comida>> comida = new List<List<Comida>>();
+        List<List<Comida>> comida = new List<List<Comida>>(); //lista para acomodar
+        List<Comida> items = new List<Comida>(); //lista real
 
         //reproductores de audio
         WMPLib.WindowsMediaPlayer player;
@@ -58,7 +60,6 @@ namespace FentDrop
         int vidas = 5; //5 vidas 
         int numeroFilas = 7; //iniciales 
         int nivelesTmp = 1;
-        int contadorDiv = 8;
 
         //booleanos
         bool comenzar = false;
@@ -89,14 +90,11 @@ namespace FentDrop
             Graphics g = e.Graphics;
 
             //List<List<Comida>> copiaReferencias = comida.ToList();
-            foreach(var filas in comida)
+            foreach(var com in items)
             {
-                foreach(var comida in filas)
+                if(!pausa && com.rec.Y >= -200)
                 {
-                    if(!pausa)
-                    {
-                        comida.Dibujar(g);
-                    }
+                    com.Dibujar(g);
                 }
             }
 
@@ -150,7 +148,7 @@ namespace FentDrop
                     centroX - (int)(size.Width / 2),
                     centroY - (int)(size.Height / 2)
                 );
-                g.DrawString(texto, fuente3, Brushes.DarkBlue, p);
+                g.DrawString(texto, fuente3, Brushes.HotPink, p);
             }
 
             if(ayudaDiddy)
@@ -187,7 +185,7 @@ namespace FentDrop
 
             //reproducimos la cancion de fondo
             musicTmp = Path.GetTempFileName() + ".mp3";
-            File.WriteAllBytes(musicTmp, Properties.Resources.music);
+            System.IO.File.WriteAllBytes(musicTmp, Properties.Resources.music);
             player = new WindowsMediaPlayer();
             player.URL = musicTmp;
             player.settings.setMode("loop", true);
@@ -196,7 +194,8 @@ namespace FentDrop
             //pausamos el timer de juego que fungia como pantalla
             //de carga 
             timerjuego.Stop();
-            comida.Clear(); //limpiamos todas las filas de comida 
+            items.Clear(); //limpiamos todas las filas de comida 
+            comida.Clear();
             comenzar = true;
             this.Invalidate();
 
@@ -211,13 +210,13 @@ namespace FentDrop
         private void cargarComidaInicio(int numeroFilas)
         { 
             //creamos la primera fila
-            int division = this.ClientSize.Width / contadorDiv;
+            int division = this.ClientSize.Width / 9;
             int cont = 0 + division;
             var comidaTmp = new List<Comida>();
             var ultimaFila = new List<Comida>();
-            for(int i = 1; i <= contadorDiv - 1; i++)
+            for(int i = 1; i <= 8; i++)
             {
-                if(rn.Next() % 2 == 0) //si es par agregamos comida buena 
+                if(rn.Next(1, 100) % 2 == 0) //si es par agregamos comida buena 
                 {
                     switch(rn.Next(1, 4))
                     {
@@ -288,9 +287,9 @@ namespace FentDrop
                 ultimaFila = comida[comida.Count - 1];
                 comidaTmp = new List<Comida>();
 
-                for(int j = 0; j < contadorDiv - 1; j++)
+                for(int j = 0; j < 8; j++)
                 {    
-                    if(rn.Next() % 2 == 0) //si es par agregamos comida buena 
+                    if(rn.Next(1, 100) % 2 == 0) //si es par agregamos comida buena 
                     {
                         switch(rn.Next(1, 4))
                         {
@@ -353,6 +352,16 @@ namespace FentDrop
                 }
                 comida.Add(comidaTmp);
             }
+
+            foreach(var filas in comida) //usaremos la lista items para todo
+            {
+                foreach(var comida in filas)
+                {
+                    items.Add(comida);
+                }
+            }
+
+            comida.Clear(); //limpiamos la temporal
         }
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -470,25 +479,24 @@ namespace FentDrop
         private async void timerjuego_Tick(object sender, EventArgs e)
         {            
             //removemos todas las filas en donde su comida sea >
-            comida.RemoveAll(c => c.All(item => item.rec.Y > this.ClientSize.Height));
+            items.RemoveAll(item => item.rec.Y > this.ClientSize.Height);
 
             //en caso de que se acaben los items
-            if(comida.Count == 0 && comenzar) //si ya no hay elementos y ya
+            if(items.Count == 0 && comenzar) //si ya no hay elementos y ya
                                               //inició el juego pasamos de nivel
             {                
                 if(!mientrasFrenesi) //si no es frenesi
                 {
                     timerjuego.Stop();
                     timerPersonaje.Stop();
+
                     niveles++; //incrementamos
                     nivelesTmp++;
-                    contadorDiv++;
 
                     if(nivelesTmp == 9) //cada 9 niveles reseteamos las filas 
                     {
                         nivelesTmp = 1;
                         numeroFilas = 10;
-                        contadorDiv = 8;
                     }
                     else
                     {
@@ -511,15 +519,14 @@ namespace FentDrop
                     timerjuego.Stop();
                     timerPersonaje.Stop();
                     timerFrenesi.Stop();
+
                     niveles++; //incrementamos
                     nivelesTmp++;
-                    contadorDiv++;
 
                     if(nivelesTmp == 9) //cada 9 niveles reseteamos las filas 
                     {
                         nivelesTmp = 1;
                         numeroFilas = 10;
-                        contadorDiv = 8;
                     }
                     else
                     {
@@ -539,7 +546,7 @@ namespace FentDrop
                     return;
                 }
             }
-            else if(comida.Count == 0 && !comenzar) //en caso contrario seguimos en
+            else if(items.Count == 0 && !comenzar) //en caso contrario seguimos en
                                                     //pantalla de carga 
             {
 
@@ -553,148 +560,136 @@ namespace FentDrop
                 return;
             }
 
-            foreach(var filas in comida) //empezamos a ver 
-            {
-                //vamos fila por fila buscando fenta//      
-                int n2 = filas.RemoveAll(comida =>
-                    comida.hitBox.IntersectsWith(personaje.hitBox) && comida.esFenta);
+            //vamos buscando fenta   
+            int n2 = items.RemoveAll(comida =>
+                comida.hitBox.IntersectsWith(personaje.hitBox) && comida.esFenta);
 
-                if(n2 > 0) //si al menos se elimino un elemento 
-                            //entramos al frenesi
+            if(n2 > 0) //si al menos se elimino un elemento 
+                        //entramos al frenesi
+            {
+                timerjuego.Stop();
+                timerPersonaje.Stop();
+                player.controls.stop();
+                efectoBueno.Stop();
+                personaje.esInmune = true;
+                ayudaDiddy = true;
+                mientrasFrenesi = true;
+                pausa = true;
+                contadorFrenesi = rn.Next(10, 16);
+                this.Invalidate();
+
+                await Task.Delay(2000);
+
+                ayudaDiddy = false;
+                pausa = false;
+                timerjuego.Start();
+                timerPersonaje.Start();
+                timerFrenesi.Start();
+                efectoFrenesi.Play();
+                return;
+            }
+
+            //de ahi eliminamos toda comida buena que choque con
+            //el personaje y le sumamos puntos
+            int n = items.RemoveAll(comida => comida.hitBox.IntersectsWith(personaje.hitBox)
+                && comida.esBuena);
+
+            if(n > 0 && comenzar) //si n > 0 minimio se elimino 1
+            {
+                puntos += n;
+
+                if(!mientrasFrenesi) //solo si no es frenesi 
+                {
+                    efectoBueno.Play();
+                    contadorTmp += n;
+                }
+
+                //si llegamos a >= 30 puntos 
+                if(contadorTmp >= 30)
+                {
+                    contadorTmp = 0;
+
+                    //buscamos el primer elemento dentro de la fila que
+                    //su pos. en Y este entre -200 y -80
+                    int j = items.FindIndex(comida => comida.rec.Y >= -500 &&
+                        comida.rec.Y <= -100);
+
+                    if(j != -1) //en caso de encontrarlo
+                    {
+                        items[j] = new Comida(
+                            items[j].rec.X,
+                            items   [j].rec.Y,
+                            imgFenta
+                        );
+                        items[j].esFenta = true;
+
+                        comidaTmp = items[j];
+                        timerParpadeo.Start();
+                    }
+                }
+            }
+
+            //en caso de que si sea sumamos puntos
+            int n3 = items.RemoveAll(c => c.hitBox.IntersectsWith(personaje.hitBox) &&
+                !c.esBuena && personaje.esInmune);
+            if (n3 > 0 && comenzar)
+            {
+                puntos += n3;
+            }
+
+            //en caso de que no quitamos vidas 
+            int n4 = items.RemoveAll(c => c.hitBox.IntersectsWith(personaje.hitBox)
+                && !c.esBuena && !personaje.esInmune);
+            if(n4 > 0)
+            {
+                efectoMalo.Play();
+
+                vidas--;
+
+                if(vidas == 0)
                 {
                     timerjuego.Stop();
                     timerPersonaje.Stop();
                     player.controls.stop();
                     efectoBueno.Stop();
-                    personaje.esInmune = true;
-                    ayudaDiddy = true;
-                    mientrasFrenesi = true;
-                    pausa = true;
-                    contadorFrenesi = rn.Next(10, 16);
+                    timerParpadeo.Stop();
+                    items.Clear();
+                    acabasDeMorir = true;
                     this.Invalidate();
 
-                    await Task.Delay(2000);
+                    //cuando el sonido y la funcion terminan
+                    await Task.Run(() => efectoMorir.PlaySync());
+                    await Task.Run(() => cargarComidaInicio(50));
 
-                    ayudaDiddy = false;
+                    //reseteamos el juego 
+                    personaje.esInmune = true;
+                    acabasDeMorir = false;
+                    comenzar = false;
+                    mientrasFrenesi = false;
                     pausa = false;
+                    ayudaDiddy = false;
+                    pasasNivel = false;
+                    numeroFilas = 7;
+                    niveles = 1;
+                    puntos = 0;
+                    contadorTmp = 0;
+                    velocidad = 6;
+                    vidas = 5;
+                    nivelesTmp = 1;
+                    personaje.CambiarPos((this.ClientSize.Width / 2) - 60,
+                        this.ClientSize.Height - 130);
                     timerjuego.Start();
                     timerPersonaje.Start();
-                    timerFrenesi.Start();
-                    efectoFrenesi.Play();
+                    this.MouseClick += Form1_MouseClick;
+                    this.Invalidate();
                     return;
-                }
-
-                //de ahi eliminamos toda comida buena que choque con
-                //el personaje y le sumamos //los puntos//
-                int n = filas.RemoveAll(comida => comida.hitBox.IntersectsWith(personaje.hitBox)
-                    && comida.esBuena);
-
-                if(n > 0 && comenzar) //si n > 0 minimio se elimino 1
-                {
-                    puntos += n;
-
-                    if(!mientrasFrenesi) //solo si no es frenesi 
-                    {
-                        efectoBueno.Play();
-                        contadorTmp += n;
-                    }
-
-                    //si llegamos a >= 25 puntos 
-                    if(contadorTmp >= 30)
-                    {
-                        contadorTmp = 0;
-
-                        //procedemos a posicionar el fenta en la matriz 
-                        foreach(var fila in comida)
-                        {
-                            //buscamos el primer elemento dentro de la fila que
-                            //su pos. en Y este entre -200 y -80
-                            int j = fila.FindIndex(comida => comida.rec.Y >= -500 &&
-                                comida.rec.Y <= -100);
-
-                            if(j != -1) //en caso de encontrarlo
-                            {
-                                fila[j] = new Comida(
-                                    fila[j].rec.X,
-                                    fila[j].rec.Y,
-                                    imgFenta
-                                );
-                                fila[j].esFenta = true;
-
-                                filaTmp = fila;
-                                comidaTmp = fila[j];
-                                timerParpadeo.Start();
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                //en caso de que si sea sumamos puntos
-                int n3 = filas.RemoveAll(c => c.hitBox.IntersectsWith(personaje.hitBox) &&
-                    !c.esBuena && personaje.esInmune);
-                if (n3 > 0 && comenzar)
-                {
-                    puntos += n3;
-                }
-
-                //en caso de que no quitamos vidas 
-                int n4 = filas.RemoveAll(c => c.hitBox.IntersectsWith(personaje.hitBox)
-                    && !c.esBuena && !personaje.esInmune);
-                if (n4 > 0)
-                {
-                    efectoMalo.Play();
-
-                    vidas--;
-
-                    if (vidas == 0)
-                    {
-                        timerjuego.Stop();
-                        timerPersonaje.Stop();
-                        player.controls.stop();
-                        efectoBueno.Stop();
-                        timerParpadeo.Stop();
-                        comida.Clear();
-                        acabasDeMorir = true;
-                        this.Invalidate();
-
-                        //cuando el sonido y la funcion terminan
-                        await Task.Run(() => efectoMorir.PlaySync());
-                        await Task.Run(() => cargarComidaInicio(50));
-
-                        //reseteamos el juego 
-                        personaje.esInmune = true;
-                        acabasDeMorir = false;
-                        comenzar = false;
-                        mientrasFrenesi = false;
-                        pausa = false;
-                        ayudaDiddy = false;
-                        pasasNivel = false;
-                        numeroFilas = 7;
-                        niveles = 1;
-                        puntos = 0;
-                        contadorTmp = 0;
-                        velocidad = 6;
-                        vidas = 5;
-                        nivelesTmp = 1;
-                        personaje.CambiarPos((this.ClientSize.Width / 2) - 60,
-                            this.ClientSize.Height - 130);
-                        timerjuego.Start();
-                        timerPersonaje.Start();
-                        this.MouseClick += Form1_MouseClick;
-                        this.Invalidate();
-                        return;
-                    }
                 }
             }
 
             //eliminamos comida mala dependiendo si es frenesi
-            foreach(var filas in comida)
+            foreach(var comida in items)
             {
-                foreach(var item in filas)
-                {
-                    item.MoverAbajo(velocidad);
-                }
+                comida.MoverAbajo(velocidad);
             }
 
             this.Invalidate();
@@ -713,15 +708,13 @@ namespace FentDrop
             }
         }
 
-        List<Comida> filaTmp = new List<Comida>();
         Comida comidaTmp = new Comida();
         private void timerParpadeo_Tick(object sender, EventArgs e)
         {
-            if(!comida.Contains(filaTmp)) //en caso de que ya no esté
+            if(!items.Contains(comidaTmp)) //en caso de que ya no esté
                                           //en la lista
             {
                 timerParpadeo.Stop();
-                filaTmp = null;
                 comidaTmp = null;
                 return;
             }
@@ -740,9 +733,9 @@ namespace FentDrop
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {            
-            if(File.Exists(musicTmp))
+            if(System.IO.File.Exists(musicTmp))
             {
-                File.Delete(musicTmp);  
+                System.IO.File.Delete(musicTmp);  
             }
         }
     }
