@@ -446,11 +446,11 @@ namespace FentDrop
 
                 if(mientrasFrenesi)
                 {
-                    personaje.MoverIzq(30);
+                    personaje.MoverIzq(40);
                 }
                 else
                 {
-                    personaje.MoverIzq(20);
+                    personaje.MoverIzq(30);
                 }
             }
             //si va a la derecha
@@ -464,11 +464,11 @@ namespace FentDrop
 
                 if(mientrasFrenesi)
                 {
-                    personaje.MoverDer(30);
+                    personaje.MoverDer(40);
                 }
                 else
                 {
-                    personaje.MoverDer(20);
+                    personaje.MoverDer(30);
                 }
             }
 
