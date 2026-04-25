@@ -33,6 +33,7 @@
             this.timerjuego = new System.Windows.Forms.Timer(this.components);
             this.timerFrenesi = new System.Windows.Forms.Timer(this.components);
             this.timerParpadeo = new System.Windows.Forms.Timer(this.components);
+            this.timerTrampa = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // timerPersonaje
@@ -54,6 +55,11 @@
             // 
             this.timerParpadeo.Interval = 500;
             this.timerParpadeo.Tick += new System.EventHandler(this.timerParpadeo_Tick);
+            // 
+            // timerTrampa
+            // 
+            this.timerTrampa.Interval = 1000;
+            this.timerTrampa.Tick += new System.EventHandler(this.timerTrampa_Tick);
             // 
             // Form1
             // 
@@ -82,6 +88,7 @@
         private System.Windows.Forms.Timer timerjuego;
         private System.Windows.Forms.Timer timerFrenesi;
         private System.Windows.Forms.Timer timerParpadeo;
+        private System.Windows.Forms.Timer timerTrampa;
     }
 }
 

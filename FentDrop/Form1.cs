@@ -9,6 +9,7 @@ using System.Linq;
 using System.Media;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Security.Permissions;
 using System.Security.Policy;
 using System.Text;
@@ -368,10 +369,12 @@ namespace FentDrop
             if(e.KeyCode == Keys.Right)
             {
                 direccion = Keys.Right;
+                contadorTrampa = 0;
             }
             if(e.KeyCode == Keys.Left)
             {
                 direccion = Keys.Left;
+                contadorTrampa = 0;
             }
         }
 
@@ -430,6 +433,7 @@ namespace FentDrop
             cargarComidaInicio(50); //se crean las primeras comidas en esta funcion
             timerjuego.Start(); //inicia la pantalla de carga
             timerPersonaje.Start();
+            timerTrampa.Start();
         }
 
         //timer para la animacion del personsaje
@@ -649,6 +653,7 @@ namespace FentDrop
                 if(vidas == 0)
                 {
                     timerjuego.Stop();
+                    timerTrampa.Stop();   
                     timerPersonaje.Stop();
                     player.controls.stop();
                     efectoBueno.Stop();
@@ -676,10 +681,12 @@ namespace FentDrop
                     velocidad = 6;
                     vidas = 5;
                     nivelesTmp = 1;
+                    contadorTrampa = 0;
                     personaje.CambiarPos((this.ClientSize.Width / 2) - 60,
                         this.ClientSize.Height - 130);
                     timerjuego.Start();
                     timerPersonaje.Start();
+                    timerTrampa.Start();
                     this.MouseClick += Form1_MouseClick;
                     this.Invalidate();
                     return;
@@ -736,6 +743,44 @@ namespace FentDrop
             if(System.IO.File.Exists(musicTmp))
             {
                 System.IO.File.Delete(musicTmp);  
+            }
+        }
+
+        int contadorTrampa = 0;
+        private void timerTrampa_Tick(object sender, EventArgs e)
+        {
+            contadorTrampa++;
+            
+            if(contadorTrampa == 8) //si llegamos a 8 segundos sin movernos 
+            {
+                //comprobamos que no esté muy a la der o a la izq
+                if(personaje.rec.X <= 55)
+                {
+                    personaje.MoverDer(250);
+                    contadorTrampa = 0;
+                    this.Invalidate();
+                    return;
+                }
+                else if(personaje.rec.X >= this.ClientSize.Width - 55)
+                {
+                    personaje.MoverIzq(250);
+                    contadorTrampa = 0;
+                    this.Invalidate();
+                    return;
+                }
+
+                //en caso de llegar acá su pos. es ideal 
+                if(rn.Next(0, 2) == 0)
+                {
+                    personaje.MoverDer(150);
+                }
+                else
+                {
+                    personaje.MoverIzq(150);
+                }
+
+                contadorTrampa = 0;
+                this.Invalidate();
             }
         }
     }
