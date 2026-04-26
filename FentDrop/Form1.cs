@@ -208,6 +208,8 @@ namespace FentDrop
 
             this.Invalidate();
         }
+
+        int contMax = 100;
         private void cargarComidaInicio(int numeroFilas)
         { 
             //creamos la primera fila
@@ -217,7 +219,7 @@ namespace FentDrop
             var ultimaFila = new List<Comida>();
             for(int i = 1; i <= 8; i++)
             {
-                if(rn.Next(1, 100) % 2 == 0) //si es par agregamos comida buena 
+                if(rn.Next(1, contMax) % 2 == 0) //si es par agregamos comida buena 
                 {
                     switch(rn.Next(1, 4))
                     {
@@ -290,7 +292,7 @@ namespace FentDrop
 
                 for(int j = 0; j < 8; j++)
                 {    
-                    if(rn.Next(1, 100) % 2 == 0) //si es par agregamos comida buena 
+                    if(rn.Next(1, contMax) % 2 == 0) //si es par agregamos comida buena 
                     {
                         switch(rn.Next(1, 4))
                         {
@@ -497,6 +499,11 @@ namespace FentDrop
                     niveles++; //incrementamos
                     nivelesTmp++;
 
+                    if(niveles == 4)
+                    {
+                        contMax = 4;
+                    }
+
                     if(nivelesTmp == 9) //cada 9 niveles reseteamos las filas 
                     {
                         nivelesTmp = 1;
@@ -526,6 +533,11 @@ namespace FentDrop
 
                     niveles++; //incrementamos
                     nivelesTmp++;
+
+                    if(niveles == 4)
+                    {
+                        contMax = 4;
+                    }
 
                     if(nivelesTmp == 9) //cada 9 niveles reseteamos las filas 
                     {
