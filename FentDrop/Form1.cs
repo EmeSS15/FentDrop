@@ -694,6 +694,7 @@ namespace FentDrop
                     vidas = 5;
                     nivelesTmp = 1;
                     contadorTrampa = 0;
+                    contMax = 100;
                     personaje.CambiarPos((this.ClientSize.Width / 2) - 60,
                         this.ClientSize.Height - 130);
                     timerjuego.Start();
